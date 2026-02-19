@@ -113,4 +113,5 @@ Active research and prototype development.
 ---
 
 ## Author
+Anitta Elasa Sebastian
 MSc Thesis in Business Informatics.
