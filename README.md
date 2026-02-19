@@ -1,35 +1,35 @@
-# Unified Intermediate Representation for Smart Contract Portability
+# Design of an Intermediate Representation for Smart Contract Portability
 
 ## Overview
-This repository contains the research artefact for my MSc thesis, which focuses on designing, implementing, and experimentally validating a Unified Intermediate Representation (UIR) to support partial portability of smart contracts between blockchain platforms. The work is centred on Ethereum (Solidity) and Hyperledger Fabric (Go chaincode).
+My MSc thesis research product, which focuses on developing, putting into practice, and experimentally testing a Unified Intermediate Representation (UIR) to provide partial portability of smart contracts between blockchain platforms, is contained in this repository. The focus of the effort is Hyperledger Fabric (Go chaincode) and Ethereum (Solidity).
 
-The goal is to move beyond conceptual interoperability by developing a formal and structured intermediate layer that captures essential contract logic independently of a specific blockchain.
+By creating a formal and structured intermediary layer that captures crucial contract logic independent of a particular blockchain, the objective is to go beyond conceptual interoperability.
 
 ---
 
 ## Research Motivation
-Smart contract platforms differ significantly in their execution models, state management, and programming paradigms. These differences limit portability and make cross-platform reuse of contract logic difficult.
+Platforms for smart contracts vary greatly in terms of programming paradigms, state management, and execution methods. These variations restrict mobility and make it challenging to reuse contract logic across platforms.
 
-Existing approaches often remain conceptual or platform-specific. This research aims to provide a technically grounded and implementation-oriented solution by:
-- Analysing execution and programming differences across platforms
-- Defining a structured intermediate representation
-- Building a prototype transformation pipeline
-- Evaluating portability using measurable indicators
+Current methods are frequently conceptual or platform-specific. The goal of this study is to offer a solution that is both technically sound and implementation-focused by:
+- Examining the variations in code and execution between platforms
+- Establishing a structured representation in the middle
+- Constructing a transformation pipeline prototype
+- Assessing portability with quantifiable metrics
 
 ---
 
 ## Research Objectives
 The main objectives of this work are:
 
-1. Analyse and compare smart contract execution models and programming paradigms of:
-   - Ethereum (Solidity)
+1. Examine and contrast the programming paradigms and smart contract execution models of:In terms of :
+   - solidity, Ethereum
    - Hyperledger Fabric (Go chaincode)
 
-2. Design a formal Unified Intermediate Representation (UIR) that captures:
-   - Contract structure
-   - State and data types
-   - Control flow and logic
-   - Platform-independent semantics
+2. Create a formal Unified Intermediate Representation (UIR) that includes the following information:
+   - The construction of contracts
+   - Data types and states
+   - Logic and control flow
+   - Semantics that are independent of platforms
 
 3. Implement a prototype transformation pipeline:
    - Solidity → UIR → Hyperledger Fabric
