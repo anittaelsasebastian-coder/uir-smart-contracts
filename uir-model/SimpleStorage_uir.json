@@ -1,0 +1,94 @@
+{
+  "uir_version": "1.0",
+  "contract_name": "SimpleStorage",
+  "source_platform": "Ethereum",
+  "source_language": "Solidity",
+"state_variables": [
+    {
+      "name": "owner",
+      "solidity_type": "address",
+      "uir_type": "address",
+      "visibility": "public",
+      "portability_barrier": "PB-2",
+      "semantic_gap": "Fabric is not a direct association with msg. sender.Ethereium owner address is a cryptographic identifier of 20 bytes and Fabric identity is certified. These two models cannot be architecturally compatible"
+    },
+    {
+      "name": "storedValue",
+      "solidity_type": "uint256",
+      "uir_type": "uint256",
+      "visibility": "public",
+      "portability_barrier": "PB-1",
+      "semantic_gap": "StoredValue is implicitly placed in a memory slot by the compiler in the Ethereum.The developer does not find the need to control its location. In Fabric there is no built in storage, all read and write operations have to be explicit in using GetState and PutState and a string key."
+    }
+  ],
+"constructor":{
+  "name": "constructor",
+  "visibility": "public",
+  "statements": [
+    {
+      "kind": "assignment",
+      "raw": "owner = msg.sender",
+      "portability_barrier": "PB-2",
+      "semantic_gap": "Automatically, the Ethereum Virtual Machine has known that it gives out msg.sender.In Fabric there is nothing equivalent. The nearest thing is GetClientIdentity, which tracks out the X.509 certificate DN string of the caller but this is an alternate model of identity altogether"
+    },
+    {
+      "kind": "assignment",
+      "raw": "storedValue=0",
+      "portability_barrier": "PB-1",
+      "semantic_gap": "In Ethereum, no explicit storage call is needed in order to set such a value.In Fabric this must be in the form of PutState in a key and a serialised value of a byte."
+    }
+  ]
+},
+"functions":[
+  {
+    "name": "store",
+    "visibility": "public",
+    "mutability": "nonpayable",
+    "parameters": [
+      {
+        "name": "_value",
+        "solidity_type": "uint256",
+        "uir_type": "uint256"
+      }
+    ],
+    "statements": [
+      {
+        "kind": "require",
+        "raw": "require(msg.sender == owner)",
+        "portability_barrier": "PB-2",
+        "semantic_gap": "This access control validation uses the method of msg.sender that is nonexistent in Fabric. The approximation is based on GetClientIdentity to read out the caller DN string and makes a comparison with the stored owner of value. The difference in trust model lies in the fact that the ownership verification in Ethereum is done by the means of a cryptographic signature, whereas Fabric, in turn, is based on the issuance of a PKI certificate"
+      },
+      {
+        "kind": "assignment",
+        "raw": "storedValue = _value",
+        "portability_barrier": "PB-1",
+        "semantic_gap": "In Ethereum this form of write is implicit. In Fabric it has to be converted into an explicit PutState call as key name storedValue and a JSON-serialised byte value of the value"
+      }
+    ]
+  },
+  {
+    "name": "retrieve",
+    "visibility": "public",
+    "mutability": "view",
+    "parameters": [],
+    "statements": [
+      {
+        "kind": "return",
+        "raw": "return storedValue",
+        "portability_barrier": "PB-1",
+        "semantic_gap": "The syntax of reading a state variable in Ethereum is the same as that of reading a local variable. In Fabric this has to be a direct GetState call and then the deserialisation of the resulting byte array."
+      }
+    ]
+  }
+],
+  "portability_summary":{
+    "barriers_present": ["PB-1","PB-2"],
+    "abstractable": ["PB-1"],
+    "approximable": ["PB-2"],
+    "non_portable": [],
+    "note": "The most basic example of a case study in this assessment is the SimpleStorage. It addresses the two basic barriers to portability. PB-1 is completely abstractable as name of state variables may be deterministically mapped to Fabric string keys. PB-2 can only be traced out, since Ethereum and Fabric identity models are architecturally incomparable and cannot be graphically transformed. This contract does not contain any events or Ether-transfers hence this does not apply to PB-3, PB-4 and PB-5"
+  }
+}
+
+
+      
