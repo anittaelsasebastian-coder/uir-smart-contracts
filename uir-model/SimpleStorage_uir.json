@@ -1,0 +1,44 @@
+{
+  "contract_name": "SimpleStorage",
+  "version": "0.1.0",
+  "state_variables": [
+    {
+      "name": "storedData",
+      "type": "uint256",
+      "visibility": "public",
+      "description": "Stores a single unsigned integer"
+    }
+  ],
+  "functions": [
+    {
+      "name": "set",
+      "visibility": "public",
+      "mutability": "nonpayable",
+      "params": [
+        { "name": "newValue", "type": "uint256" }
+      ],
+      "returns": "void",
+      "statements": [
+        {
+          "type": "assign",
+          "target": "storedData",
+          "expression": { "type": "parameter", "name": "newValue" }
+        }
+      ]
+    },
+    {
+      "name": "get",
+      "visibility": "public",
+      "mutability": "view",
+      "params": [],
+      "returns": "uint256",
+      "statements": [
+        {
+          "type": "return",
+          "expression": { "type": "variable", "name": "storedData" }
+        }
+      ]
+    }
+  ],
+  "events": []
+}
