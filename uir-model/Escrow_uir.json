@@ -1,0 +1,189 @@
+{
+    "uir_version": "1.0",
+    "contract_name": "Escrow",
+    "source_platform": "Ethereum",
+    "source_language": "Solidity",
+
+    "state_variables": [
+    {
+        "name": "depositor",
+        "solidity_type":"address",
+        "uir_type": "address",
+        "visibility":"public",
+        "portability_barrier": "PB-2",
+        "semantic_gap": "While Ethereum addresses are 20-byte cryptographic identifiers‚ Fabric identities are certificate-based X․509 DN strings․ These two identity models are architecturally incompatible"
+    },
+    {
+        "name":"beneficiary",
+        "solidity_type":"address",
+        "uir_type":"address",
+        "visibility":"public",
+        "portability_barrier":"PB-2",
+        "semantic_gap":"Similar to the depositor‚ an Ethereum address cannot be directly mapped to Fabric X․509 identity"
+    },
+    {
+        "name":"arbiter",
+        "solidity_type":"address",
+        "uir_type":"address",
+        "visibility":"public",
+        "portability_barrier":"PB-2",
+        "semantic_gap":"The Fabric X.509 identity cannot be simply translated to an Ethereum address"
+    },
+    {
+        "name": "balance",
+        "solidity_type":"uint256",
+        "uir_type":"uint256",
+        "visibility":"public",
+        "portability_barrier":"PB-1",
+        "semantic_gap":"The implicit Ethereum storage slot must be replaced with explicit Fabric GetState and PutState calls with a specific key"
+    },
+    {
+        "name":"isApproved",
+        "solidity_type":"bool",
+        "uir_type":"bool",
+        "visibility":"public",
+        "portability_barrier":"PB-1",
+        "semantic_gap":"Implicit Ethereum storage slots must be converted to explicit Fabric GetState and PutState calls with key"
+    }
+    ],
+    "constructor":{
+        "name": "constructor",
+        "visibility":"public",
+        "parameters":[
+            {"name":"_beneficiary","solidity_type":"address","uir_type":"address"},
+            {"name":"_arbiter","solidity_type":"address","uir_type":"address"}
+        ],
+        "statements":[
+            {
+                "kind":"assignment",
+                "raw":"depositor = msg.sender",
+                "portability_barrier":"PB-2",
+                "semantic_gap": "Fabric does not have a direct counterpart for msg.sender. Using GetClientIdentity to approximate"
+            },
+            {
+                "kind":"assignment",
+                "raw":"beneficiary = _beneficiary",
+                "portability_barrier": "PB-1",
+                "semantic_gap":"State writing needs to be made clear. Fabric's PutState call"
+            },
+            {
+                "kind":"assignment",
+                "raw":"arbiter = _arbiter",
+                "portability_barrier":"PB-1",
+                "semantic_gap":"State writing needs to be made clear. Fabric's PutState call"
+            },
+            {
+                "kind":"assignment",
+                "raw":"isApproved = false",
+                "portability_barrier":"PB-1",
+                "semantic_gap":"State writing needs to be made clear. Fabric's PutState call"
+            },
+            {
+                "kind":"assignment",
+                "raw":"balance = 0",
+                "portability_barrier":"PB-1",
+                "semantic_gap":"State writing needs to be made clear. Fabric's PutState call"
+            }
+        ]
+    },
+    "functions":[
+        {
+            "name":"deposit",
+            "visibility":"public",
+            "mutability":"payable",
+            "parameters":[],
+            "statements":[
+                {
+                    "kind":"requird",
+                    "raw":"require(msg.sender == depositor)",
+                    "portability_barrier": "PB-2",
+                    "semantic_gap":"There is no direct equivalent of the msg.sender identity check in Fabric. GetClientIdentity DN string comparison was used to approximate"
+                },
+                {
+                    "kind":"assignment",
+                    "raw":"balance += msg.value",
+                    "portability_barrier":"PB-4",
+                    "semantic_gap":"Solidity's uint256 arithmetic automatically reverts on overflow. Go doesn't. large.Semantic equivalency requires the use of Int"
+                },
+                {
+                    "kind":"emit",
+                    "raw":"emit Deposited(msg.sender,msg.value)",
+                    "portability_barrier":"PB-5",
+                    "semantic_gap":"Logs of Ethereum occurrences are permanently indexed. Fabric events are subscription-based and cannot be permanently queried at the contract level"
+                }
+            ]
+        },
+        {
+            "name":"approve",
+            "visibility":"public",
+            "mutability":"nonpayable",
+            "parameters":[],
+            "statements":[
+                {
+                    "kind":"requird",
+                    "raw":"require(msg.sender == arbiter)",
+                    "portability_barrier":"PB-2",
+                    "semantic_gap":"msg․sender identity check approximated through comparing GetClientIdentity DN strings in Fabric"
+                },
+                {
+                    "kind":"requird",
+                    "raw":"require(balance > 0)",
+                    "portability_barrier":"PB-1",
+                    "semantic_gap":"The state read must be explicit in Fabric GetState"
+                },
+                {
+                    "kind":"transfer",
+                    "raw":"payable(beneficiary).transfer(amount)",
+                    "portability_barrier":"PB-3",
+                    "semantic_gap":"Ether transfer portability to Fabric‚ which has no built-in currency‚ requires a token chaincode or off-chain settlement of payments"
+                },
+                {
+                    "kind":"emit",
+                    "raw":"emit Approved(amount)",
+                    "portability_barrier":"PB-5",
+                    "semantic_gap":"Event logs in Ethereum are permanently indexed․ In Fabric‚ events are temporary‚ subscription-based"
+                }
+            ]
+        },
+        {
+            "name":"getBalance",
+            "visibility":"public",
+            "mutability":"view",
+            "parameters":[],
+            "statements":[
+                {
+                    "kind":"return",
+                    "raw":"return balance",
+                    "portability_barrier":"PB-1",
+                    "semantic_gap":"The state read needs to be made clear. Fabric's GetState call"
+                }
+            ]
+        }
+    ],
+    "events":[
+        {
+            "name":"Deposited",
+            "parameters":[
+                {"name":"depositor","solidity_type": "address","uir_type":"address"},
+                {"name":"amount","solidity_type":"uint256","uir_type":"uint256"}
+            ],
+            "portability_barrier":"PB-5",
+            "semantic_gap":"It is not possible to reproduce Ethereum permanent indexed event logs at the contract level in Fabric. Redesigning the application layer is necessary"
+        },
+        {
+            "name":"Approved",
+            "parameters":[
+                {"name":"amount","solidity_type":"uint256","uir_type":"uint256"}
+            ],
+            "portability_barrier":"PB-5",
+            "semantic_gap":"It is not possible to reproduce Ethereum permanent indexed event logs at the contract level in Fabric. Redesigning the application layer is necessary"
+        }
+    ],
+    "portability_summary":{
+        "barriers_present":["PB-1","PB-2","PB-3","PB-4","PB-5"],
+        "abstractable":["PB-1"],
+        "approximable":["PB-2","PB-4"],
+        "non_portable":["PB-3","PB-5"],
+        "note":"The most comprehensive case study that addresses each of the five portability obstacles is escrow. At the contract level, PB-3 Ether transfer and PB-5 event queryability are not transferable"
+    }
+}
