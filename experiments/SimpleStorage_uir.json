@@ -1,0 +1,27 @@
+{
+  "uir_version": "1.0",
+  "contract_name": "SimpleStorage",
+  "source_platform": "Ethereum",
+  "source_language": "Solidity",
+  "state_variables": [
+    {
+      "name": "storedValue",
+      "solidity_type": "uint256",
+      "uir_type": "uint256",
+      "visibility": "public",
+      "portability_barrier": "PB-1"
+    }
+  ],
+  "constructor": null,
+  "functions": [],
+  "portability_summary": {
+    "barriers_present": [
+      "PB-1"
+    ],
+    "abstractable": [
+      "PB-1"
+    ],
+    "approximable": [],
+    "non_portable": []
+  }
+}
