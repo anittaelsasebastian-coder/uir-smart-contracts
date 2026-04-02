@@ -1,44 +1,60 @@
 {
+  "uir_version": "1.0",
   "contract_name": "SimpleStorage",
-  "version": "0.1.0",
+  "source_platform": "Ethereum",
+  "source_language": "Solidity",
   "state_variables": [
     {
-      "name": "storedData",
-      "type": "uint256",
+      "name": "storedValue",
+      "solidity_type": "uint256",
+      "uir_type": "uint256",
       "visibility": "public",
-      "description": "Stores a single unsigned integer"
+      "portability_barrier": "PB-1",
+      "semantic_gap": "Unlike Ethereum‚ where storedValue is implicitly stored in a memory slot‚ which is allocated by the compiler‚ there is no state storage in Fabric‚ forcing the developer to read/write the state via a predefined string key‚ using the GetState and PutState functions"
     }
   ],
+  "constructor": null,
   "functions": [
     {
-      "name": "set",
+      "name": "store",
       "visibility": "public",
       "mutability": "nonpayable",
-      "params": [
-        { "name": "newValue", "type": "uint256" }
+      "parameters": [
+        {
+          "name": "_value",
+          "solidity_type": "uint256",
+          "uir_type": "uint256"
+        }
       ],
-      "returns": "void",
       "statements": [
         {
-          "type": "assign",
-          "target": "storedData",
-          "expression": { "type": "parameter", "name": "newValue" }
+          "kind": "assignment",
+          "raw": "storedValue = _value",
+          "portability_barrier": "PB-1",
+          "semantic_gap": " This is an implicit write to the state in Ethereum․ In Fabric this has to be an explicit PutState call with the storedValue as the key"
         }
       ]
     },
     {
-      "name": "get",
+      "name": "retrieve",
       "visibility": "public",
       "mutability": "view",
-      "params": [],
-      "returns": "uint256",
+      "parameters": [],
       "statements": [
         {
-          "type": "return",
-          "expression": { "type": "variable", "name": "storedData" }
+          "kind": "return",
+          "raw": "return storedValue",
+          "portability_barrier": "PB-1",
+          "semantic_gap": "In Ethereum‚ reading a state variable is the same as reading a local variable‚ while in Fabric it has to call a GetState API and deserialise the returned byte array"
         }
       ]
     }
   ],
-  "events": []
+  "portability_summary": {
+    "barriers_present": ["PB-1"],
+    "abstractable": ["PB-1"],
+    "approximable": [],
+    "non_portable": [],
+    "note": "SimpleStorage is the simplest case study: only PB-1 is implemented‚ and there are no access control‚ event logging‚ or Ether transfer․ PB-2 through PB-5 are not implemented in this contract"
+  }
 }
