@@ -1,0 +1,140 @@
+{
+    "uir_version":"1.0",
+    "contract_name":"SimpleToken",
+    "source_platform":"Ethereum",
+    "source_language":"Solidity",
+    "state_variables":[
+        {
+            "name":"owner",
+            "solidity_type":"address",
+            "uir_type":"address",
+            "visibility":"public",
+            "portability_barrier":"PB-2",
+            "semantic_gap":"Fabric identities are X.509 certificate-based and cannot be easily mapped, unlike Ethereum addresses are 20-byte identifiers"
+        },
+        {
+            "name":"totalSupply",
+            "solidity_type":"uint256",
+            "uir_type":"uint256",
+            "visibility":"public",
+            "portability_barrier":"PB-1",
+            "semantic_gap":"Explicit GetState and PutState actions in Fabric must take the place of implicit Ethereum storage"
+        },
+        {
+            "name":"balances",
+            "solidity_type":"mapping(address => uint256)",
+            "uir_type":"mapping",
+            "visibility":"public",
+            "is_mapping":true,
+            "mapping_key_type":"address",
+            "mapping_value_type":"uint256",
+            "portability_barrier":"PB-1",
+            "semantic_gap":"Ethereum mappings use implicit hashed storage, but Fabric requires explicit composite keys like balances_address with manual GetState and PutState management"
+        }
+    ],
+    "constructor":{
+        "name":"constructor",
+        "visibility":"public",
+        "parameters":[
+            {"name":"_initialSupply","solidity_type":"uint256","uir_type":"uint256"}
+        ],
+        "statements":[
+            {
+                "kind":"assignment",
+                "raw":"owner = msg․sender",
+                "portability_barrier":"PB-2",
+                "semantic_gap":"Fabric does not have a direct counterpart for msg.sender. Using GetClientIdentity to approximate"
+            },
+            {
+                "kind":"assignment",
+                "raw":"totalSupply = _initialSupply",
+                "portability_barrier": "PB-1",
+                "semantic_gap":"State writing needs to be made clear. Fabric's PutState call"
+            },
+            {
+                "kind":"assignment",
+                "raw":"balances[msg.sender] = _initialSupply",
+                "portability_barrier":"PB-1",
+                "semantic_gap":"Mapping writing needs to be made clear. Fabric's PutState call using the composite key balances_address"
+            }
+        ]
+    },
+    "functions":[
+        {
+            "name":"transfer",
+            "visibility":"public",
+            "mutability":"nonpayable",
+            "parameters":[
+                {"name":"_to","solidity_type":"address","uir_type":"address"},
+                {"name":"_amount","solidity_type":"uint256","uir_type":"uint256"}
+            ],
+            "statements":[
+                {
+                    "kind":"require",
+                    "raw":"require(balances[msg.sender] >= _amount)",
+                    "portability_barrier":"PB-1",
+                    "semantic_gap":"In Fabric, mapping read needs to become an explicit GetState call with a composite key"
+                },
+                {
+                    "kind":"require",
+                    "raw":"require(_to != address(0))",
+                    "portability_barrier":"PB-2",
+                    "semantic_gap":"There is no direct equivalent for address(0) check in Fabric. Comparing empty strings is an approximation"
+                },
+                {
+                    "kind":"assignment",
+                    "raw":"balances[msg.sender] -= _amount",
+                    "portability_barrier":"PB-4",
+                    "semantic_gap":"Solidity's uint256 arithmetic with overflow prevention. Go needs to be large.For semantic equivalency, use Int"
+                },
+                {
+                    "kind":"assignment",
+                    "raw":"balances[_to] += _amount)",
+                    "portability_barrier":"PB-4",
+                    "semantic_gap":"Solidity's uint256 arithmetic with overflow prevention. Go needs to be large.For semantic equivalency, use Int"
+                },
+                {
+                    "kind":"emit",
+                    "raw":"emit Transfer(msg.sender, _to, _amount)",
+                    "portability_barrier":"PB-5",
+                    "semantic_gap":"Logs of Ethereum occurrences are permanently indexed. Fabric events are only available with a subscription"
+                }
+            ]
+        },
+        {
+            "name":"balanceOf",
+            "visibility":"public",
+            "mutability":"view",
+            "parameters":[
+                {"name":"_account","solidity_type":"address","uir_type":"address"}
+            ],
+            "statements":[
+                {
+                    "kind":"return",
+                    "raw":"return balances[_account]",
+                    "portability_barrier":"PB-1",
+                    "semantic_gap":"Mapping read needs to be made clear. Fabric's GetState function using the composite key balances_account"
+                }
+            ]
+        }
+    ],
+    "events":[
+        {
+            "name":"Transfer",
+            "parameters":[
+                {"name":"from","solidity_type":"address","uir_type":"address"},
+                {"name":"to","solidity_type":"address","uir_type":"address"},
+                {"name":"amount","solidity_type":"uint256","uir_type":"uint256"}
+            ],
+            "portability_barrier":"PB-5",
+            "semantic_gap":"It is not possible to reproduce Ethereum permanent indexed event logs at the contract level in Fabric. Redesigning the application layer is necessary"
+        }
+    ],
+    "portability_summary":{
+        "barriers_present":["PB-1","PB-2","PB-4","PB-5"],
+        "abstractable":["PB-1"],
+        "approximable":["PB-2","PB-4"],
+        "non_portable":["PB-5"],
+        "note":"PB-1 is made more difficult by SimpleToken's introduction of mapping state. PB-3 is absent since there is no ether transmission. PB-5's event delivery semantics make it non-portable"
+    }
+}
