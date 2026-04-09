@@ -1,7 +1,6 @@
 package main
 
 import (
-    "encoding/json"
     "fmt"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
 )

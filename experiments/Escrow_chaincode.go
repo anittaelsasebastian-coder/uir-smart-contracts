@@ -107,17 +107,13 @@ func (s *SmartContract) Approve(ctx contractapi.TransactionContextInterface) err
     ctx.GetStub().SetEvent("approveEvent", eventPayload)
     return nil
 }
-func (s *SmartContract) GetBalance(ctx contractapi.TransactionContextInterface) error {
-    // PB-1: return balance -> GetState
-    return nil
-}
 
 func main() {
-    chaincode, err := contractapi.NewChaincode(&SmartContract{})
+    cc, err := contractapi.NewChaincode(&SmartContract{})
     if err != nil {
         panic(fmt.Sprintf("Error creating chaincode: %v", err))
     }
-    if err := chaincode.Start(); err != nil {
+    if err := cc.Start(); err != nil {
         panic(fmt.Sprintf("Error starting chaincode: %v", err))
     }
 }
