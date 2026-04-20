@@ -205,3 +205,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+experiments/Escrow_chaincode
+experiments/SimpleStorage_chaincode
+experiments/SimpleToken_chaincode
