@@ -94,7 +94,7 @@
             "parameters":[],
             "statements":[
                 {
-                    "kind":"requird",
+                    "kind":"require",
                     "raw":"require(msg.sender == depositor)",
                     "portability_barrier": "PB-2",
                     "semantic_gap":"There is no direct equivalent of the msg.sender identity check in Fabric. GetClientIdentity DN string comparison was used to approximate"
