@@ -1,117 +1,69 @@
-# Design of an Intermediate Representation for Smart Contract Portability
+# UIR: Smart Contract Portability via Unified Intermediate Representation
 
-## Overview
-My MSc thesis research product, which focuses on developing, putting into practice, and experimentally testing a Unified Intermediate Representation (UIR) to provide partial portability of smart contracts between blockchain platforms, is contained in this repository. The focus of the effort is Hyperledger Fabric (Go chaincode) and Ethereum (Solidity).
+A prototype pipeline that transforms Ethereum smart contracts (Solidity) into Hyperledger Fabric chaincode (Go), using a platform-independent intermediate representation as the translation layer.
 
-By creating a formal and structured intermediary layer that captures crucial contract logic independent of a particular blockchain, the objective is to go beyond conceptual interoperability.
-
----
-
-## Research Motivation
-Platforms for smart contracts vary greatly in terms of programming paradigms, state management, and execution methods. These variations restrict mobility and make it challenging to reuse contract logic across platforms.
-
-Current methods are frequently conceptual or platform-specific. The goal of this study is to offer a solution that is both technically sound and implementation-focused by:
-- Examining the variations in code and execution between platforms
-- Establishing a structured representation in the middle
-- Constructing a transformation pipeline prototype
-- Assessing portability with quantifiable metrics
+MSc Thesis — Business Informatics, Riga Technical University
+Published thesis: https://doi.org/10.5281/zenodo.20732000
 
 ---
 
-## Research Objectives
-The main objectives of this work are:
+## What This Does
 
-1. Examine and contrast the programming paradigms and smart contract execution models of:In terms of :
-   - solidity, Ethereum
-   - Hyperledger Fabric (Go chaincode)
+Smart contracts written for Ethereum cannot run on Hyperledger Fabric.The platforms differ in programming model, state management, and execution environment. This project builds a structured middle layer — the UIR — that captures contract logic independently of either platform, then generates working Fabric chaincode from it.
 
-2. Create a formal Unified Intermediate Representation (UIR) that includes the following information:
-   - The construction of contracts
-   - Data types and states
-   - Logic and control flow
-   - Semantics that are independent of platforms
+**Pipeline:**
+Solidity contract → Parser → UIR (JSON) → Generator → Go chaincode
 
-3. Implement a prototype transformation pipeline:
-   - Solidity → UIR → Hyperledger Fabric
-
-4. Validate the approach using representative contract patterns.
-
-5. Experimentally evaluate portability and identify systematic limitations.
+Validated against three contract types: storage, payment/transfer, and escrow.
 
 ---
 
-## System Architecture
-The proposed system is organised into the following components:
+## Repository Structure
 
-- **parser**  
-  Extracts structural and semantic information from Solidity smart contracts.
-
-- **uir-spec**  
-  Formal definition of the UIR, including schemas, elements, and mapping rules.
-
-- **uir-model**  
-  Core intermediate representation data structures and semantic abstractions.
-
-- **generator**  
-  Code generation for Hyperledger Fabric from the intermediate representation.
-
-- **experiments**  
-  Test contracts, evaluation scripts, and benchmarking.
+| Folder | What it does |
+|--------|-------------|
+| `parser/` | Parses Solidity source into UIR JSON |
+| `uir-spec/` | Formal UIR schema and mapping rules |
+| `uir-model/` | Core UIR data structures |
+| `generator/` | Generates Hyperledger Fabric Go chaincode from UIR |
+| `experiments/` | Test contracts, evaluation scripts, results |
 
 ---
 
-## Transformation Workflow
-1. Input Solidity smart contract.
-2. Static analysis and parsing.
-3. Transformation into the Unified Intermediate Representation.
-4. Platform-independent analysis and validation.
-5. Code generation for Hyperledger Fabric.
-6. Experimental evaluation.
+## Requirements
+
+- Python 3.x
+- Go (for compiling generated chaincode)
 
 ---
 
-## Evaluation Strategy
-The prototype is evaluated using selected representative contract types:
-- Storage contract
-- Payment/transfer contract
-- Escrow contract
+## How to Run
 
-Evaluation focuses on measurable indicators of portability, including:
-- Percentage of structure and logic automatically transformed
-- Categories of portable and non-portable features
-- Systematic incompatibility patterns
-- Required manual adaptation
+```bash
+# 1. Parse a Solidity contract into UIR
+cd parser
+python parser.py ../experiments/escrow.sol
 
-This ensures repeatable and analytically structured validation.
+# 2. Generate Fabric chaincode from UIR
+cd ../generator
+python generator.py ../experiments/escrow_uir.json
 
----
-
-## Scientific Contribution
-This research contributes a structured and implementation-oriented approach to smart contract portability by:
-- Designing a formal intermediate representation
-- Enabling systematic analysis of platform differences
-- Providing empirical insights into portability limits
+# Output: compilable Go chaincode
+```
 
 ---
 
-## Practical Contribution
-The thesis delivers a working prototype demonstrating partial automated transformation between Ethereum and Hyperledger Fabric, offering practical insights into cross-platform contract reuse.
+## Key Findings
 
----
-
-## Current Status
-Active research and prototype development.
-
----
-
-## Future Work
-- Support for additional blockchain platforms
-- Security and vulnerability analysis at the intermediate level
-- Automation of semantic verification
-- Extension to more complex contract patterns
+- Automated structural transformation:- 6 of 14 Solidity feature categories (43%) fully abstractable into UIR,4 categories (29%) approximated with documented semantic gaps, 4 categories (29%) architecturally non-portable
+- All 3 generated Go chaincodes compiled successfully
+- Identified 5 systematic portability barriers (PB-1 to PB-5)
+- Identified 5 semantic gap categories (SG-0 to SG-4)
 
 ---
 
 ## Author
-Anitta Elasa Sebastian
-MSc Thesis in Business Informatics.
+
+Anitta Elsa Sebastian  
+MSc Business Informatics, Riga Technical University  
+[Zenodo DOI](https://doi.org/10.5281/zenodo.20732000)
